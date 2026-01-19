@@ -26,13 +26,17 @@ public class UserService : IUserService
 
     public async Task<List<UserDto>> GetAllUsersAsync()
     {
-        var users = await _userManager.Users.ToListAsync();
+        var users = await _userManager.Users
+            .Include(u => u.Profile)
+            .ToListAsync();
         return users.Select(MapToUserDto).ToList();
     }
 
     public async Task<UserDto?> GetUserByIdAsync(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.Users
+            .Include(u => u.Profile)
+            .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
         return user == null ? null : MapToUserDto(user);
     }
 
@@ -148,9 +152,20 @@ public class UserService : IUserService
             Id: user.Id.ToString(),
             Email: user.Email!,
             UserName: user.UserName!,
-            DisplayName: user.DisplayName,
-            Bio: user.Bio,
-            Image: user.ImageUrl,
-            CreatedAt: user.CreatedAt);
+            FirstName: user.Profile?.FirstName,
+            LastName: user.Profile?.LastName,
+            DisplayName: user.Profile?.DisplayName ?? user.DisplayName,
+            Bio: user.Profile?.Bio ?? user.Bio,
+            ImageUrl: user.Profile?.ImageUrl ?? user.ImageUrl,
+            PhoneNumber: user.Profile?.PhoneNumber,
+            DateOfBirth: user.Profile?.DateOfBirth,
+            Gender: user.Profile?.Gender,
+            Address: user.Profile?.Address,
+            City: user.Profile?.City,
+            State: user.Profile?.State,
+            Country: user.Profile?.Country,
+            PostalCode: user.Profile?.PostalCode,
+            CreatedAt: user.Profile?.CreatedAt ?? user.CreatedAt,
+            UpdatedAt: user.Profile?.UpdatedAt);
     }
 }

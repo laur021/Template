@@ -103,6 +103,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Template v1");
+        options.EnableTryItOutByDefault();
+        options.DisplayRequestDuration();
     });
 }
 
