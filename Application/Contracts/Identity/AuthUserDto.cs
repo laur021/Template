@@ -10,4 +10,9 @@ public record AuthUserDto
     public string? DisplayName { get; init; }
     public string? ImageUrl { get; init; }
     public bool EmailConfirmed { get; init; }
+
+    /// <summary>
+    /// User's roles for frontend authorization (e.g., showing/hiding admin features).
+    /// </summary>
+    public List<string> Roles { get; init; } = new();
 }

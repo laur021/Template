@@ -132,7 +132,15 @@ public static class DependencyInjection
             // };
         });
 
-        services.AddAuthorization();
+        // Configure Authorization with policies
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", policy =>
+                policy.RequireRole("Admin"));
+
+            options.AddPolicy("User", policy =>
+                policy.RequireRole("User", "Admin")); // Admin can also access User-level resources
+        });
 
         // ======================================
         // Configuration Options

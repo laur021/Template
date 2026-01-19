@@ -555,14 +555,14 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync(cancellationToken);
 
         return AuthResult.Success(
-            MapToUserDto(user),
+            MapToUserDto(user, roles),
             accessToken,
             accessTokenExpiration,
             refreshToken,
             refreshTokenExpiration);
     }
 
-    private static AuthUserDto MapToUserDto(AppUser user)
+    private static AuthUserDto MapToUserDto(AppUser user, IList<string>? roles = null)
     {
         return new AuthUserDto
         {
@@ -570,7 +570,8 @@ public class AuthService : IAuthService
             Email = user.Email!,
             DisplayName = user.DisplayName,
             ImageUrl = user.ImageUrl,
-            EmailConfirmed = user.EmailConfirmed
+            EmailConfirmed = user.EmailConfirmed,
+            Roles = roles?.ToList() ?? new List<string>()
         };
     }
 

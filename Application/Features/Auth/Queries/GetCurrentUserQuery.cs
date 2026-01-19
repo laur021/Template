@@ -10,16 +10,10 @@ namespace Application.Features.Auth.Queries;
 /// </summary>
 public record GetCurrentUserQuery : IQuery<Result<AuthUserDto>>;
 
-public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Result<AuthUserDto>>
+public class GetCurrentUserQueryHandler(IAuthService authService, ICurrentUserService currentUser) : IQueryHandler<GetCurrentUserQuery, Result<AuthUserDto>>
 {
-    private readonly IAuthService _authService;
-    private readonly ICurrentUserService _currentUser;
-
-    public GetCurrentUserQueryHandler(IAuthService authService, ICurrentUserService currentUser)
-    {
-        _authService = authService;
-        _currentUser = currentUser;
-    }
+    private readonly IAuthService _authService = authService;
+    private readonly ICurrentUserService _currentUser = currentUser;
 
     public async Task<Result<AuthUserDto>> Handle(GetCurrentUserQuery query, CancellationToken cancellationToken)
     {
