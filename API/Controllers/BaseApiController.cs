@@ -1,0 +1,39 @@
+using Application.Core;
+using Cortex.Mediator;
+using Microsoft.AspNetCore.Mvc;
+
+namespace API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class BaseApiController : ControllerBase
+{
+    private IMediator? _mediator;
+
+    protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
+
+    protected ActionResult HandleResult<T>(Result<T> result)
+    {
+        if (result == null)
+            return NotFound();
+
+        if (result.IsSuccess && result.Value != null)
+            return Ok(result.Value);
+
+        if (result.IsSuccess && result.Value == null)
+            return NotFound();
+
+        return StatusCode(result.StatusCode, new { error = result.Error });
+    }
+
+    protected ActionResult HandleResult(Result result)
+    {
+        if (result == null)
+            return NotFound();
+
+        if (result.IsSuccess)
+            return Ok();
+
+        return StatusCode(result.StatusCode, new { error = result.Error });
+    }
+}
