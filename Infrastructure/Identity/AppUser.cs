@@ -46,4 +46,10 @@ public class AppUser : IdentityUser<Guid>
     /// Navigation property to user's refresh tokens.
     /// </summary>
     public ICollection<RefreshTokenEntity> RefreshTokens { get; set; } = new List<RefreshTokenEntity>();
+
+    /// <summary>
+    /// Navigation property to user's extended profile/details.
+    /// 1:1 relationship - UserProfile stores additional user information.
+    /// </summary>
+    public UserProfileEntity? Profile { get; set; }
 }

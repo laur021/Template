@@ -30,8 +30,8 @@ public static class DbInitializer
             // Seed roles
             await SeedRolesAsync(roleManager, logger);
 
-            // Seed admin user
-            await SeedAdminUserAsync(userManager, logger);
+            // Seed admin user with profile
+            await SeedAdminUserAsync(userManager, context, logger);
 
             logger.LogInformation("Database initialization completed successfully");
         }
@@ -74,6 +74,7 @@ public static class DbInitializer
 
     private static async Task SeedAdminUserAsync(
         UserManager<AppUser> userManager,
+        AppDbContext context,
         ILogger logger)
     {
         const string adminEmail = "admin@example.com";
@@ -98,6 +99,21 @@ public static class DbInitializer
             if (result.Succeeded)
             {
                 await userManager.AddToRolesAsync(adminUser, new[] { "Admin", "User" });
+
+                // Create user profile with extended details
+                var adminProfile = new UserProfileEntity
+                {
+                    Id = adminUser.Id,
+                    FirstName = "System",
+                    LastName = "Administrator",
+                    DisplayName = "Administrator",
+                    Bio = "System administrator account",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                context.UserProfiles.Add(adminProfile);
+                await context.SaveChangesAsync();
+
                 logger.LogInformation(
                     "Created admin user: {Email} with password: {Password}",
                     adminEmail, adminPassword);
@@ -111,6 +127,25 @@ public static class DbInitializer
         }
         else
         {
+            // Ensure profile exists for existing admin user
+            var profileExists = await context.UserProfiles.AnyAsync(p => p.Id == adminUser.Id);
+            if (!profileExists)
+            {
+                var adminProfile = new UserProfileEntity
+                {
+                    Id = adminUser.Id,
+                    FirstName = "System",
+                    LastName = "Administrator",
+                    DisplayName = "Administrator",
+                    Bio = "System administrator account",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                context.UserProfiles.Add(adminProfile);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Created profile for existing admin user: {Email}", adminEmail);
+            }
+
             logger.LogInformation("Admin user already exists: {Email}", adminEmail);
         }
     }

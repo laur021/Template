@@ -19,6 +19,11 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     /// </summary>
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
+    /// <summary>
+    /// User profiles - extended user details (1:1 with AspNetUsers).
+    /// </summary>
+    public DbSet<UserProfileEntity> UserProfiles => Set<UserProfileEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -59,6 +64,32 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
             entity.HasOne(rt => rt.User)
                 .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure UserProfile (1:1 relationship with AppUser)
+        builder.Entity<UserProfileEntity>(entity =>
+        {
+            entity.HasKey(up => up.Id);
+
+            entity.Property(up => up.FirstName).HasMaxLength(100);
+            entity.Property(up => up.LastName).HasMaxLength(100);
+            entity.Property(up => up.DisplayName).HasMaxLength(100);
+            entity.Property(up => up.Bio).HasMaxLength(1000);
+            entity.Property(up => up.ImageUrl).HasMaxLength(500);
+            entity.Property(up => up.PhoneNumber).HasMaxLength(20);
+            entity.Property(up => up.Gender).HasMaxLength(20);
+            entity.Property(up => up.Address).HasMaxLength(200);
+            entity.Property(up => up.City).HasMaxLength(100);
+            entity.Property(up => up.State).HasMaxLength(100);
+            entity.Property(up => up.Country).HasMaxLength(100);
+            entity.Property(up => up.PostalCode).HasMaxLength(20);
+
+            // 1:1 relationship with AppUser (AspNetUsers)
+            // The Id is both PK and FK to AspNetUsers
+            entity.HasOne(up => up.User)
+                .WithOne(u => u.Profile)
+                .HasForeignKey<UserProfileEntity>(up => up.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }
