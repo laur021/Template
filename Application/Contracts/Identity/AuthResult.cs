@@ -8,7 +8,7 @@ namespace Application.Contracts.Identity;
 public record AuthResult
 {
     public bool Succeeded { get; init; }
-    public UserDto? User { get; init; }
+    public AuthUserDto? User { get; init; }
     public string? AccessToken { get; init; }
     public DateTime AccessTokenExpiration { get; init; }
 
@@ -27,7 +27,7 @@ public record AuthResult
     public int StatusCode { get; init; } = 200;
 
     public static AuthResult Success(
-        UserDto user,
+        AuthUserDto user,
         string accessToken,
         DateTime accessTokenExpiration,
         string refreshToken,

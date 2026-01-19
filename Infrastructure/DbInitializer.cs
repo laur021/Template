@@ -108,6 +108,14 @@ public static class DbInitializer
                     LastName = "Administrator",
                     DisplayName = "Administrator",
                     Bio = "System administrator account",
+                    PhoneNumber = "+1234567890",
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    Gender = "Not Specified",
+                    Address = "123 Admin Street",
+                    City = "Admin City",
+                    State = "Admin State",
+                    Country = "United States",
+                    PostalCode = "12345",
                     CreatedAt = DateTime.UtcNow
                 };
 

@@ -3,7 +3,7 @@ namespace Application.Contracts.Identity;
 /// <summary>
 /// DTO for authenticated user information returned after login/register.
 /// </summary>
-public record UserDto
+public record AuthUserDto
 {
     public Guid Id { get; init; }
     public string Email { get; init; } = string.Empty;

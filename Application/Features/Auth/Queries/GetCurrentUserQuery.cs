@@ -8,9 +8,9 @@ namespace Application.Features.Auth.Queries;
 /// <summary>
 /// Query to get the current authenticated user's information.
 /// </summary>
-public record GetCurrentUserQuery : IQuery<Result<UserDto>>;
+public record GetCurrentUserQuery : IQuery<Result<AuthUserDto>>;
 
-public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Result<UserDto>>
+public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Result<AuthUserDto>>
 {
     private readonly IAuthService _authService;
     private readonly ICurrentUserService _currentUser;
@@ -21,20 +21,20 @@ public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Res
         _currentUser = currentUser;
     }
 
-    public async Task<Result<UserDto>> Handle(GetCurrentUserQuery query, CancellationToken cancellationToken)
+    public async Task<Result<AuthUserDto>> Handle(GetCurrentUserQuery query, CancellationToken cancellationToken)
     {
         if (_currentUser.UserId == null)
         {
-            return Result<UserDto>.Unauthorized();
+            return Result<AuthUserDto>.Unauthorized();
         }
 
         var user = await _authService.GetUserByIdAsync(_currentUser.UserId.Value, cancellationToken);
 
         if (user == null)
         {
-            return Result<UserDto>.NotFound("User not found");
+            return Result<AuthUserDto>.NotFound("User not found");
         }
 
-        return Result<UserDto>.Success(user);
+        return Result<AuthUserDto>.Success(user);
     }
 }

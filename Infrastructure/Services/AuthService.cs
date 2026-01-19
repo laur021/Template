@@ -503,7 +503,7 @@ public class AuthService : IAuthService
         return EmailResult.Success();
     }
 
-    public async Task<UserDto?> GetUserByIdAsync(
+    public async Task<AuthUserDto?> GetUserByIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
@@ -511,7 +511,7 @@ public class AuthService : IAuthService
         return user == null ? null : MapToUserDto(user);
     }
 
-    public async Task<UserDto?> GetUserByEmailAsync(
+    public async Task<AuthUserDto?> GetUserByEmailAsync(
         string email,
         CancellationToken cancellationToken = default)
     {
@@ -562,9 +562,9 @@ public class AuthService : IAuthService
             refreshTokenExpiration);
     }
 
-    private static UserDto MapToUserDto(AppUser user)
+    private static AuthUserDto MapToUserDto(AppUser user)
     {
-        return new UserDto
+        return new AuthUserDto
         {
             Id = user.Id,
             Email = user.Email!,

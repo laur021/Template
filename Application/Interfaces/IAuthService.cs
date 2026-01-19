@@ -125,14 +125,14 @@ public interface IAuthService
     /// <summary>
     /// Get user by ID.
     /// </summary>
-    Task<UserDto?> GetUserByIdAsync(
+    Task<AuthUserDto?> GetUserByIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get user by email.
     /// </summary>
-    Task<UserDto?> GetUserByEmailAsync(
+    Task<AuthUserDto?> GetUserByEmailAsync(
         string email,
         CancellationToken cancellationToken = default);
 }

@@ -11,7 +11,7 @@ public record AuthResponse
     /// <summary>
     /// The authenticated user's information.
     /// </summary>
-    public UserDto User { get; init; } = null!;
+    public AuthUserDto User { get; init; } = null!;
 
     /// <summary>
     /// JWT access token for API authorization.
