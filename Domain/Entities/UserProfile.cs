@@ -5,7 +5,7 @@ namespace Domain.Entities;
 /// This table has a 1:1 relationship with AspNetUsers (AppUser).
 /// AspNetUsers handles authentication, this table stores extended profile details.
 /// </summary>
-public class User
+public class UserProfile
 {
     /// <summary>
     /// Primary key - same as AppUser.Id (foreign key to AspNetUsers).
