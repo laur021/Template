@@ -9,6 +9,7 @@ namespace API.Controllers;
 /// Authentication and authorization endpoints.
 /// Handles user registration, login, token refresh, password management, and external authentication.
 /// </summary>
+[Tags("1Auth")]
 public class AuthController : BaseApiController
 {
     private const string RefreshTokenCookieName = "refresh_token";

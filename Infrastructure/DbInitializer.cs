@@ -27,6 +27,13 @@ public static class DbInitializer
             logger.LogInformation("Applying database migrations...");
             await context.Database.MigrateAsync();
 
+            // Skip seeding if data already exists
+            if (await context.Users.AnyAsync() || await context.MenuSections.AnyAsync())
+            {
+                logger.LogInformation("Database already contains data, skipping seeding");
+                return;
+            }
+
             // Seed roles
             await SeedRolesAsync(roleManager, logger);
 
