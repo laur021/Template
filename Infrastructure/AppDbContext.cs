@@ -24,6 +24,40 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     /// </summary>
     public DbSet<UserProfileEntity> UserProfiles => Set<UserProfileEntity>();
 
+    #region Menu System
+
+    /// <summary>
+    /// Menu sections (parent level navigation).
+    /// </summary>
+    public DbSet<MenuSectionEntity> MenuSections => Set<MenuSectionEntity>();
+
+    /// <summary>
+    /// Menu items (child level navigation).
+    /// </summary>
+    public DbSet<MenuItemEntity> MenuItems => Set<MenuItemEntity>();
+
+    /// <summary>
+    /// Menu sub-items (grandchild level navigation).
+    /// </summary>
+    public DbSet<MenuSubItemEntity> MenuSubItems => Set<MenuSubItemEntity>();
+
+    /// <summary>
+    /// Page actions (buttons/operations on pages).
+    /// </summary>
+    public DbSet<PageActionEntity> PageActions => Set<PageActionEntity>();
+
+    /// <summary>
+    /// Role-menu access permissions.
+    /// </summary>
+    public DbSet<RoleMenuAccessEntity> RoleMenuAccess => Set<RoleMenuAccessEntity>();
+
+    /// <summary>
+    /// Role-action access permissions.
+    /// </summary>
+    public DbSet<RoleActionAccessEntity> RoleActionAccess => Set<RoleActionAccessEntity>();
+
+    #endregion
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -92,5 +126,118 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
                 .HasForeignKey<UserProfileEntity>(up => up.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        #region Menu System Configuration
+
+        // Configure MenuSection
+        builder.Entity<MenuSectionEntity>(entity =>
+        {
+            entity.HasKey(ms => ms.Id);
+            entity.Property(ms => ms.Name).IsRequired().HasMaxLength(100);
+            entity.Property(ms => ms.Icon).HasMaxLength(50);
+            entity.HasIndex(ms => ms.DisplayOrder);
+        });
+
+        // Configure MenuItem
+        builder.Entity<MenuItemEntity>(entity =>
+        {
+            entity.HasKey(mi => mi.Id);
+            entity.Property(mi => mi.Name).IsRequired().HasMaxLength(100);
+            entity.Property(mi => mi.Icon).HasMaxLength(50);
+            entity.Property(mi => mi.Route).HasMaxLength(200);
+            entity.HasIndex(mi => mi.DisplayOrder);
+            entity.HasIndex(mi => mi.Route);
+
+            entity.HasOne(mi => mi.Section)
+                .WithMany(s => s.MenuItems)
+                .HasForeignKey(mi => mi.SectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure MenuSubItem
+        builder.Entity<MenuSubItemEntity>(entity =>
+        {
+            entity.HasKey(msi => msi.Id);
+            entity.Property(msi => msi.Name).IsRequired().HasMaxLength(100);
+            entity.Property(msi => msi.Icon).HasMaxLength(50);
+            entity.Property(msi => msi.Route).IsRequired().HasMaxLength(200);
+            entity.HasIndex(msi => msi.DisplayOrder);
+            entity.HasIndex(msi => msi.Route);
+
+            entity.HasOne(msi => msi.MenuItem)
+                .WithMany(mi => mi.SubItems)
+                .HasForeignKey(msi => msi.MenuItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure PageAction
+        builder.Entity<PageActionEntity>(entity =>
+        {
+            entity.HasKey(pa => pa.Id);
+            entity.Property(pa => pa.Code).IsRequired().HasMaxLength(50);
+            entity.Property(pa => pa.Name).IsRequired().HasMaxLength(100);
+            entity.Property(pa => pa.Description).HasMaxLength(500);
+            entity.HasIndex(pa => pa.Code);
+
+            entity.HasOne(pa => pa.MenuItem)
+                .WithMany(mi => mi.Actions)
+                .HasForeignKey(pa => pa.MenuItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pa => pa.MenuSubItem)
+                .WithMany(msi => msi.Actions)
+                .HasForeignKey(pa => pa.MenuSubItemId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // Configure RoleMenuAccess
+        builder.Entity<RoleMenuAccessEntity>(entity =>
+        {
+            entity.HasKey(rma => rma.Id);
+
+            // Composite index for faster lookups
+            entity.HasIndex(rma => new { rma.RoleId, rma.SectionId, rma.MenuItemId, rma.SubItemId });
+
+            entity.HasOne(rma => rma.Role)
+                .WithMany()
+                .HasForeignKey(rma => rma.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(rma => rma.Section)
+                .WithMany(s => s.RoleMenuAccess)
+                .HasForeignKey(rma => rma.SectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(rma => rma.MenuItem)
+                .WithMany(mi => mi.RoleMenuAccess)
+                .HasForeignKey(rma => rma.MenuItemId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(rma => rma.SubItem)
+                .WithMany(msi => msi.RoleMenuAccess)
+                .HasForeignKey(rma => rma.SubItemId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // Configure RoleActionAccess
+        builder.Entity<RoleActionAccessEntity>(entity =>
+        {
+            entity.HasKey(raa => raa.Id);
+
+            // Composite index for faster lookups
+            entity.HasIndex(raa => new { raa.RoleId, raa.ActionId }).IsUnique();
+
+            entity.HasOne(raa => raa.Role)
+                .WithMany()
+                .HasForeignKey(raa => raa.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(raa => raa.Action)
+                .WithMany(pa => pa.RoleActionAccess)
+                .HasForeignKey(raa => raa.ActionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        #endregion
     }
 }

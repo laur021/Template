@@ -158,6 +158,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IMenuService, MenuService>();
 
         return services;
     }

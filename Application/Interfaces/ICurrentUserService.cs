@@ -20,4 +20,9 @@ public interface ICurrentUserService
     /// Whether the current request is authenticated.
     /// </summary>
     bool IsAuthenticated { get; }
+
+    /// <summary>
+    /// The roles of the currently authenticated user.
+    /// </summary>
+    IEnumerable<string> Roles { get; }
 }
