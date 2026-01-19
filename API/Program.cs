@@ -1,4 +1,3 @@
-using API.Endpoints;
 using API.Middleware;
 using API.Services;
 using Application;
@@ -24,6 +23,9 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 // Register Exception Middleware
 builder.Services.AddScoped<ExceptionMiddleware>();
+
+// Add Controllers
+builder.Services.AddControllers();
 
 // ======================================
 // CORS Configuration for Angular SPA
@@ -104,11 +106,8 @@ app.UseCors("AngularApp");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ======================================
-// Map Minimal API Endpoints
-// ======================================
-app.MapAuthEndpoints();
-app.MapUserEndpoints();
+// Map Controllers
+app.MapControllers();
 
 // Health check endpoint
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
