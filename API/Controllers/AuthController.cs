@@ -1,4 +1,5 @@
 using Application.Contracts.Identity;
+using Application.Core;
 using Application.Features.Auth.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -196,7 +197,7 @@ public class AuthController : BaseApiController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
     {
-        return HandleResult(await Mediator.SendCommandAsync<ChangePasswordCommand, Application.Core.Result>(
+        return HandleResult(await Mediator.SendCommandAsync<ChangePasswordCommand, Result>(
             new ChangePasswordCommand { CurrentPassword = request.CurrentPassword, NewPassword = request.NewPassword }));
     }
 
