@@ -1,0 +1,13 @@
+<input
+  [type]="type()"
+  [class]="classes()"
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [disabled]="disabled()"
+  [readOnly]="readonly()"
+  [required]="required()"
+  [attr.name]="name()"
+  [attr.autocomplete]="autocomplete()"
+  [attr.aria-invalid]="invalid()"
+  (input)="handleInput($event)"
+/>

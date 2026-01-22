@@ -1,12 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { themes } from '../../layout/theme';
 import { Button } from '../../shared/components/button/button';
+import { Inputfield } from '../../shared/components/inputfield/inputfield';
 
 @Component({
   selector: 'app-page-login',
-  imports: [Button],
+  imports: [Button, Inputfield],
   templateUrl: './page-login.html',
-  styleUrl: './page-login.css',
 })
 export class PageLogin {
   protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'corporate');
