@@ -1,0 +1,24 @@
+<button
+  [type]="type()"
+  [class]="classes()"
+  [disabled]="isDisabled()"
+  [attr.aria-disabled]="isDisabled()"
+  [attr.aria-busy]="loading()"
+  (click)="!isDisabled() && clicked.emit()"
+>
+  @if (loading()) {
+    <span class="loading loading-spinner" aria-hidden="true"></span>
+  }
+
+  <span class="flex items-center gap-2">
+    @if (icon() && iconPosition() === 'start' && !loading()) {
+      <i [class]="icon()" aria-hidden="true"></i>
+    }
+
+    <ng-content />
+
+    @if (icon() && iconPosition() === 'end' && !loading()) {
+      <i [class]="icon()" aria-hidden="true"></i>
+    }
+  </span>
+</button>
