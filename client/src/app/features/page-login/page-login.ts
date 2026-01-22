@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
+import { AuthApiService } from '../../core/services/auth-api-service';
+import { AuthStateService } from '../../core/services/auth-state-service';
 import { themes } from '../../layout/theme';
 import { Button } from '../../shared/components/button/button';
 import { Inputfield } from '../../shared/components/inputfield/inputfield';
-import { AuthApiService } from '../../core/services/auth-api-service';
-import { AuthStateService } from '../../core/services/auth-state-service';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 interface LoginData {
   email: string;
@@ -68,15 +69,25 @@ export class PageLogin {
 
     const { email, password } = this.loginForm.value;
 
-    this.authApi.login(email!, password!).subscribe({
-      next: (auth) => {
-        this.authState.setAuth(auth);
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.error.set(err?.error?.message ?? 'Invalid email or password');
-        this.loading.set(false);
-      },
-    });
+    this.authApi
+      .login(email!, password!)
+      .pipe(
+        finalize(() => {
+          // Always clear loading regardless of success or failure
+          this.loading.set(false);
+        }),
+      )
+      .subscribe({
+        next: (auth) => {
+          // Clear explicit logout flag if present (user signed back in)
+          sessionStorage.removeItem('auth-logged-out');
+          this.authState.setAuth(auth);
+          // Navigate after state is set
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          this.error.set(err?.error?.message ?? 'Invalid email or password');
+        },
+      });
   }
 }

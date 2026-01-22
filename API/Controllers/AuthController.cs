@@ -229,17 +229,17 @@ public class AuthController : BaseApiController
             // Prevents token interception on insecure connections
             Secure = true,
 
-            // SameSite=Strict: Cookie not sent with any cross-site requests
-            // Provides strong CSRF protection
-            // Note: For some scenarios, SameSite=Lax may be needed
-            SameSite = SameSiteMode.Strict,
+            // SameSite=None: Required when the SPA and API run on different origins (different ports/origins)
+            // This allows the browser to send the HttpOnly refresh cookie on cross-origin XHR/fetch requests
+            // IMPORTANT: When using SameSite=None you must also set Secure=true and configure CORS with AllowCredentials()
+            SameSite = SameSiteMode.None,
 
             // Expiration matches the refresh token's expiration
             Expires = authResult.RefreshTokenExpiration,
 
-            // Path: Limit cookie to auth endpoints only
-            // Reduces cookie exposure to other endpoints
-            Path = "/api/auth"
+            // Path: limit cookie to API endpoints (ensures the cookie is sent for API calls)
+            // Using '/api' makes the cookie available to all API auth endpoints regardless of casing
+            Path = "/api"
         };
 
         Response.Cookies.Append(
@@ -257,8 +257,8 @@ public class AuthController : BaseApiController
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Path = "/api/auth"
+            SameSite = SameSiteMode.None,
+            Path = "/api"
         });
     }
 
