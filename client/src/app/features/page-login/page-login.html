@@ -2,6 +2,7 @@
   <form
     class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-6"
     (ngSubmit)="login()"
+    [formGroup]="loginForm"
   >
     <!-- Email -->
     <span class="label">Email</span>
@@ -10,8 +11,15 @@
       placeholder="mail@site.com"
       [required]="true"
       [fullWidth]="true"
-      (valueChange)="email.set($event)"
+      formControlName="email"
     />
+
+    @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('required')) {
+      <p class="text-error text-sm mt-1">Email is required</p>
+    }
+    @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('email')) {
+      <p class="text-error text-sm mt-1">Please enter a valid email</p>
+    }
 
     <!-- Password -->
     <span class="label">Password</span>
@@ -20,8 +28,15 @@
       placeholder="Password"
       [required]="true"
       [fullWidth]="true"
-      (valueChange)="password.set($event)"
+      formControlName="password"
     />
+
+    @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('required')) {
+      <p class="text-error text-sm mt-1">Password is required</p>
+    }
+    @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('minlength')) {
+      <p class="text-error text-sm mt-1">Password must be at least 8 characters</p>
+    }
 
     <!-- Error -->
     @if (error()) {
@@ -37,7 +52,7 @@
       type="submit"
       [fullWidth]="true"
       [loading]="loading()"
-      [disabled]="loading()"
+      [disabled]="loading() || loginForm.invalid"
     >
       Login
     </app-button>
