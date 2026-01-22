@@ -1,11 +1,49 @@
 <div class="flex w-full h-screen justify-center items-center">
-  <form class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-6">
+  <form
+    class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-6"
+    (ngSubmit)="login()"
+  >
+    <!-- Email -->
     <span class="label">Email</span>
-    <app-inputfield type="email" placeholder="mail@site.com" [required]="true" />
+    <app-inputfield
+      type="email"
+      placeholder="mail@site.com"
+      [required]="true"
+      [fullWidth]="true"
+      (valueChange)="email.set($event)"
+    />
+
+    <!-- Password -->
     <span class="label">Password</span>
-    <app-inputfield type="password" placeholder="Password" [required]="true" />
-    <app-button [variant]="'secondary'" [fullWidth]="true" class="mt-6">Login</app-button>
-    <app-button [variant]="'accent'" [fullWidth]="true" [style]="'soft'">
+    <app-inputfield
+      type="password"
+      placeholder="Password"
+      [required]="true"
+      [fullWidth]="true"
+      (valueChange)="password.set($event)"
+    />
+
+    <!-- Error -->
+    @if (error()) {
+      <p class="text-error text-sm mt-2">
+        {{ error() }}
+      </p>
+    }
+
+    <!-- Login -->
+    <app-button
+      class="mt-6"
+      variant="secondary"
+      type="submit"
+      [fullWidth]="true"
+      [loading]="loading()"
+      [disabled]="loading()"
+    >
+      Login
+    </app-button>
+
+    <!-- Google -->
+    <app-button variant="accent" [fullWidth]="true" [style]="'soft'" [disabled]="loading()">
       <svg
         aria-label="Google logo"
         width="16"
@@ -21,14 +59,16 @@
           <path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path>
         </g>
       </svg>
-      Login with Google</app-button
-    >
-    <div class="dropdown flex justify-center">
+      Login with Google
+    </app-button>
+
+    <!-- Theme switcher -->
+    <div class="dropdown flex justify-center mt-4">
       <div tabindex="0" role="button" class="btn m-1">
         Theme
         <svg
-          width="12px"
-          height="12px"
+          width="12"
+          height="12"
           class="inline-block h-2 w-2 fill-current opacity-60"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 2048 2048"
@@ -36,20 +76,21 @@
           <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
         </svg>
       </div>
+
       <ul
         tabindex="-1"
         class="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-base-content/30"
       >
         @for (theme of themes; track $index) {
-          <li (click)="handleSelectTheme(theme)">
+          <li>
             <input
               type="radio"
               name="theme-dropdown"
               class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-              [aria-label]="themes[$index]"
+              [aria-label]="theme"
               [value]="theme"
               [checked]="selectedTheme() === theme"
-              (change)="selectedTheme.set(theme)"
+              (change)="handleSelectTheme(theme)"
             />
           </li>
         }

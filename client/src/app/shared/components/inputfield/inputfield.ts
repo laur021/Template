@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, output, signal } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 type InputVariant =
   | 'primary'
@@ -20,8 +21,15 @@ type InputType = 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | '
   selector: 'app-inputfield',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './inputfield.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => Inputfield),
+      multi: true,
+    },
+  ],
 })
-export class Inputfield {
+export class Inputfield implements ControlValueAccessor {
   readonly value = input<string>('');
   readonly type = input<InputType>('text');
   readonly placeholder = input<string>('');
@@ -31,6 +39,7 @@ export class Inputfield {
   readonly style = input<InputStyle>('bordered');
 
   readonly disabled = input(false);
+  protected readonly cvaDisabled = signal(false);
   readonly readonly = input(false);
   readonly required = input(false);
   readonly fullWidth = input(false);
@@ -77,8 +86,37 @@ export class Inputfield {
       .join(' '),
   );
 
+  private onChange: (value: string) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  writeValue(value: string): void {
+    this._value = value ?? '';
+  }
+
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
+
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
+  }
+
+  /* internal value */
+  protected _value = '';
+
   protected handleInput(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.valueChange.emit(target.value);
+    this._value = target.value;
+    this.onChange(target.value);
+  }
+
+  protected handleBlur() {
+    this.onTouched();
   }
 }
