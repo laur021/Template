@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface AuthResponse {
   user: {
@@ -16,31 +17,31 @@ export interface AuthResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/auth';
+  private readonly baseUrl = environment.apiUrl;
 
   login(email: string, password: string) {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, {
-      email,
-      password,
-    }, {
-      withCredentials: true, // 🔴 REQUIRED for refresh cookie
-    });
+    return this.http.post<AuthResponse>(
+      `${this.baseUrl}/Auth/login`,
+      {
+        email,
+        password,
+      },
+      {
+        withCredentials: true, // 🔴 REQUIRED for refresh cookie
+      },
+    );
   }
 
   refresh() {
     return this.http.post<AuthResponse>(
-      `${this.baseUrl}/refresh`,
+      `${this.baseUrl}/Auth/refresh`,
       {},
       { withCredentials: true }
     );
   }
 
   logout() {
-    return this.http.post(
-      `${this.baseUrl}/logout`,
-      {},
-      { withCredentials: true }
-    );
+    return this.http.post(`${this.baseUrl}/Auth/logout`, {}, { withCredentials: true });
   }
 
   register(payload: {
@@ -49,10 +50,8 @@ export class AuthApiService {
     displayName?: string;
     confirmationUrlBase: string;
   }) {
-    return this.http.post<AuthResponse>(
-      `${this.baseUrl}/register`,
-      payload,
-      { withCredentials: true }
-    );
+    return this.http.post<AuthResponse>(`${this.baseUrl}/Auth/register`, payload, {
+      withCredentials: true,
+    });
   }
 }
